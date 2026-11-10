@@ -105,4 +105,13 @@ docker run --rm alpine:3.20 sh -c "apk add --no-cache apache2-utils && ab -n 100
 ### Teste Least Connections
 
 ```bash
-docker run --rm alpine:3.20 sh -c "apk add --no-cache apache2-utils && ab -n 1000 -c 20 http://host.docker.internal:8080
+docker run --rm alpine:3.20 sh -c "apk add --no-cache apache2-utils && ab -n 1000 -c 20 http://host.docker.internal:8080/least"
+```
+
+### Parâmetros utilizados
+
+- `-n 1000`: quantidade total de requisições.
+- `-c 20`: quantidade de requisições simultâneas.
+- `--rm`: remove o contêiner temporário após a execução.
+
+O Apache Benchmark apresenta informações como quantidade de requisições concluídas, falhas, tempo total e requisições por segundo.
