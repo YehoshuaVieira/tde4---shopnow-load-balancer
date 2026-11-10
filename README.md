@@ -2,7 +2,9 @@
 
 ## Sobre o projeto
 
-Projeto acadêmico que simula um e-commerce chamado ShopNow durante a Black Friday, utilizando múltiplas instâncias de servidores e um balanceador de carga para distribuir as requisições.
+Projeto acadêmico que simula um e-commerce chamado **ShopNow** durante a Black Friday, utilizando múltiplas instâncias de servidores e um balanceador de carga para distribuir as requisições.
+
+O objetivo é demonstrar como o balanceamento de carga permite distribuir acessos entre diferentes servidores, melhorar a capacidade de atendimento e manter o sistema funcionando mesmo quando uma das instâncias fica indisponível.
 
 ## Tecnologias utilizadas
 
@@ -16,33 +18,59 @@ Projeto acadêmico que simula um e-commerce chamado ShopNow durante a Black Frid
 
 O projeto possui três instâncias independentes da aplicação PHP, executadas em contêineres Docker.
 
-O Nginx atua como balanceador de carga, recebendo as requisições na porta 8080 e distribuindo-as entre os servidores.
+O Nginx atua como balanceador de carga, recebendo as requisições na porta `8080` e distribuindo-as entre os servidores.
+
+**Estrutura da arquitetura:**
+
+- Servidor 1 — aplicação PHP.
+- Servidor 2 — aplicação PHP.
+- Servidor 3 — aplicação PHP.
+- Nginx — responsável pelo balanceamento de carga.
 
 ## Algoritmos implementados
 
-- **Round Robin:** distribui as requisições sequencialmente entre os servidores.
+O projeto implementa dois algoritmos de balanceamento:
+
+- **Round Robin:** distribui as requisições sequencialmente entre os servidores disponíveis.
 - **Least Connections:** direciona as requisições ao servidor com menos conexões ativas.
+
+## Pré-requisitos
+
+Antes de executar o projeto, é necessário possuir:
+
+- Docker Desktop instalado.
+- Docker Compose disponível.
+- Docker Desktop iniciado e em execução.
 
 ## Como executar
 
-Na pasta do projeto, execute:
+Abra o terminal na pasta do projeto e execute:
 
 ```bash
 docker compose up -d --build
 ```
 
-Acesse no navegador:
+Esse comando constrói as imagens necessárias e inicia os três servidores e o balanceador.
 
-http://localhost:8080
+Para verificar se os contêineres estão funcionando:
 
-Para testar os algoritmos:
+```bash
+docker compose ps
+```
 
+Os quatro contêineres devem aparecer com o status `Up`.
+
+## Acessando a aplicação
+
+Após iniciar os contêineres, acesse no navegador:
+
+- Aplicação: http://localhost:8080
 - Round Robin: http://localhost:8080/rr
 - Least Connections: http://localhost:8080/least
 
-## Teste de falha
+## Simulação de falha
 
-É possível simular a indisponibilidade de um servidor:
+É possível simular a indisponibilidade de um servidor utilizando:
 
 ```bash
 docker compose stop server2
@@ -50,30 +78,31 @@ docker compose stop server2
 
 Depois, realize novas requisições ao balanceador para verificar se os demais servidores continuam atendendo.
 
-Para restaurar:
+Para restaurar o servidor:
 
 ```bash
 docker compose start server2
 ```
 
-## Teste de desempenho
-
-Foi utilizado o Apache Benchmark para simular múltiplas requisições simultâneas e observar o desempenho do sistema.
-
-Exemplo:
+Para verificar novamente os contêineres:
 
 ```bash
-ab -n 1000 -c 20 http://localhost:8080/rr
+docker compose ps
 ```
 
-## Encerramento
+## Teste de desempenho com Apache Benchmark
 
-Para parar os contêineres:
+Foi utilizado o Apache Benchmark (AB) para simular múltiplas requisições simultâneas e observar o desempenho do sistema.
+
+Os testes podem ser executados utilizando o Alpine Linux em um contêiner temporário, sem precisar instalar o Apache Benchmark diretamente no Windows.
+
+### Teste Round Robin
 
 ```bash
-docker compose down
+docker run --rm alpine:3.20 sh -c "apk add --no-cache apache2-utils && ab -n 1000 -c 20 http://host.docker.internal:8080/rr"
 ```
 
-## Autor
+### Teste Least Connections
 
-Projeto desenvolvido individualmente para fins acadêmicos.
+```bash
+docker run --rm alpine:3.20 sh -c "apk add --no-cache apache2-utils && ab -n 1000 -c 20 http://host.docker.internal:8080
