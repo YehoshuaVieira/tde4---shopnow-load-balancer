@@ -1,0 +1,43 @@
+services:
+
+  server1:
+    build: .
+    container_name: shopnow-server1
+    environment:
+      SERVER_ID: "Servidor 1"
+    networks:
+      - shopnow
+
+  server2:
+    build: .
+    container_name: shopnow-server2
+    environment:
+      SERVER_ID: "Servidor 2"
+    networks:
+      - shopnow
+
+  server3:
+    build: .
+    container_name: shopnow-server3
+    environment:
+      SERVER_ID: "Servidor 3"
+    networks:
+      - shopnow
+
+  loadbalancer:
+    image: nginx:alpine
+    container_name: shopnow-loadbalancer
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - server1
+      - server2
+      - server3
+    networks:
+      - shopnow
+
+networks:
+  shopnow:
+    driver: bridge
