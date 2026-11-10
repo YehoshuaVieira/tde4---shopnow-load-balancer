@@ -96,17 +96,27 @@ Foi utilizado o Apache Benchmark (AB) para simular múltiplas requisições simu
 
 Os testes podem ser executados utilizando o Alpine Linux em um contêiner temporário, sem precisar instalar o Apache Benchmark diretamente no Windows.
 
-### Teste Round Robin
+### Teste de carga — Round Robin
 
 ```bash
 docker run --rm alpine:3.20 sh -c "apk add --no-cache apache2-utils && ab -n 1000 -c 20 http://host.docker.internal:8080/rr"
 ```
 
-### Teste Least Connections
+### Teste de carga — Least Connections
 
 ```bash
 docker run --rm alpine:3.20 sh -c "apk add --no-cache apache2-utils && ab -n 1000 -c 20 http://host.docker.internal:8080/least"
 ```
+
+### Teste de distribuição — Least Connections
+
+Para observar melhor a distribuição das conexões simultâneas, foi criada uma rota com atraso de 1,5 segundo na resposta.
+
+```bash
+docker run --rm alpine:3.20 sh -c "apk add --no-cache apache2-utils && ab -n 12 -c 12 -s 30 http://host.docker.internal:8080/slowleast"
+```
+
+Esse teste foi realizado com três servidores ativos e também com apenas dois servidores ativos, permitindo comparar a distribuição das requisições.
 
 ### Parâmetros utilizados
 
